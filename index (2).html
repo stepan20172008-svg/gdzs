@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SoloGDZ — решалка всего</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.2.1/math.js"></script>
+<style>
+:root{--bg1:#0a0a0a;--bg2:#1a1a2e;--bg3:#16213e;--bg4:#0f0f1f;--txt:#fff;--dim:#ccc;--ddim:#888;--glass:rgba(255,255,255,.04);--gb:rgba(255,255,255,.08);--acc:#764ba2;--acc2:#667eea;--ok:#00c853;--err:#ff4444}
+body.light{--bg1:#f5f7fa;--bg2:#e4e9f0;--bg3:#d8e0ec;--bg4:#eef2f7;--txt:#1a1a2e;--dim:#333;--ddim:#666;--glass:rgba(0,0,0,.04);--gb:rgba(0,0,0,.1)}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,sans-serif}
+body{min-height:100vh;background:linear-gradient(135deg,var(--bg1),var(--bg2) 40%,var(--bg3) 70%,var(--bg4));padding:20px 20px 100px;color:var(--txt);transition:.4s}
+.container{max-width:1000px;margin:0 auto}
+@keyframes wig{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
+@keyframes pop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes slideIn{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes slideOut{to{transform:translateX(120%);opacity:0}}
+@keyframes glow{0%,100%{box-shadow:0 2px 8px rgba(255,215,0,.4)}50%{box-shadow:0 2px 20px rgba(255,215,0,.8)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.header{text-align:center;padding:20px 0 15px;position:relative}
+.header h1{font-size:72px;font-weight:900;text-shadow:4px 4px 0 #ff006e,8px 8px 20px rgba(255,0,110,.3);letter-spacing:3px;transform:rotate(-2deg);display:inline-block;animation:wig 3s ease-in-out infinite;color:var(--txt)}
+.header p{font-size:18px;margin-top:10px;opacity:.9;color:var(--dim)}
+.header-controls{position:absolute;top:20px;right:0;display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.dev-btn{padding:10px 20px;background:var(--glass);color:var(--txt);border:1px solid var(--gb);border-radius:20px;cursor:pointer;font-weight:bold;transition:.3s;backdrop-filter:blur(12px)}
+.dev-btn:hover{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.3)}
+.login-banner{background:var(--glass);backdrop-filter:blur(16px);border:1px solid var(--gb);padding:12px 18px;border-radius:12px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.login-banner .user-info{font-weight:bold}
+.login-banner .login-btn{padding:8px 20px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;border-radius:20px;cursor:pointer;font-weight:bold;transition:.3s}
+.login-banner .login-btn:hover{opacity:.85;transform:scale(1.03)}
+.login-banner .login-btn.logout{background:#ff4444}
+.rank-badge{display:inline-block;padding:2px 12px;border-radius:12px;font-size:12px;font-weight:bold;margin-left:8px}
+.rank-creator{background:linear-gradient(135deg,#ff006e,#764ba2);color:#fff;box-shadow:0 2px 8px rgba(255,0,110,.4)}
+.rank-owner{background:linear-gradient(135deg,#ff6b00,#ff006e);color:#fff}
+.rank-legend{background:linear-gradient(135deg,#ffd700,#ff8c00);color:#1a1a2e;animation:glow 2s infinite}
+.rank-friend{background:linear-gradient(135deg,#00e676,#00c853);color:#1a1a2e}
+.rank-helper{background:linear-gradient(135deg,#00bcd4,#0097a7);color:#fff}
+.rank-head-admin{background:linear-gradient(135deg,#ff1744,#d50000);color:#fff;animation:glow 2s infinite}
+.rank-admin{background:linear-gradient(135deg,#ff4444,#cc0000);color:#fff}
+.rank-moderator{background:linear-gradient(135deg,#ff8800,#ff4400);color:#fff}
+.rank-senior{background:linear-gradient(135deg,#00c853,#009624);color:#fff}
+.rank-member{background:linear-gradient(135deg,#2979ff,#0d47a1);color:#fff}
+.rank-user{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.1)}
+.rank-newbie{background:rgba(255,255,255,.08);color:#ccc;border:1px solid rgba(255,255,255,.06)}
+.rank-guest{background:rgba(255,255,255,.05);color:#aaa;border:1px solid rgba(255,255,255,.05)}
+.rank-banned{background:#ff1744;color:#fff;animation:pulse 1.5s infinite}
+.tabs{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.tab{flex:1;min-width:140px;padding:15px;background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--gb);color:var(--dim);border-radius:12px;font-size:16px;cursor:pointer;transition:.3s}
+.tab:hover{background:rgba(255,255,255,.12);color:var(--txt)}
+.tab.active{background:rgba(255,255,255,.15);color:var(--txt);font-weight:bold;border-color:rgba(255,255,255,.2);box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.card{background:var(--glass);backdrop-filter:blur(20px);border:1px solid var(--gb);border-radius:20px;padding:30px;box-shadow:0 10px 40px rgba(0,0,0,.4)}
+.section{display:none}
+.section.active{display:block;animation:pop .3s ease-out}
+textarea,input,select{width:100%;padding:15px;background:#1e1e3a;border:2px solid rgba(118,75,162,.4);border-radius:10px;font-size:16px;color:#fff;font-family:'Courier New',monospace;resize:vertical;transition:.3s}
+textarea::placeholder,input::placeholder{color:rgba(255,255,255,.45)}
+body.light textarea,body.light input,body.light select{background:#fff;border-color:#764ba2;color:#1a1a2e}
+body.light textarea::placeholder,body.light input::placeholder{color:rgba(0,0,0,.4)}
+textarea:focus,input:focus,select:focus{outline:none;border-color:#764ba2;box-shadow:0 0 0 4px rgba(118,75,162,.25),0 0 20px rgba(118,75,162,.3);background:#252550}
+body.light textarea:focus,body.light input:focus,body.light select:focus{background:#f0f4ff}
+select{font-family:'Segoe UI',sans-serif;cursor:pointer}
+select option{background:#1a1a2e;color:#fff}
+.controls{display:flex;gap:10px;margin:15px 0;flex-wrap:wrap}
+.controls select{flex:1;min-width:150px}
+.action{padding:15px 30px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;border-radius:10px;font-size:16px;cursor:pointer;font-weight:bold;transition:.3s;display:inline-flex;align-items:center;gap:8px;justify-content:center}
+.action:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 5px 15px rgba(118,75,162,.4)}
+.action:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
+.action.secondary{background:rgba(255,255,255,.1);color:var(--txt);border:1px solid var(--gb)}
+.action.danger{background:#ff4444}
+.action.success{background:#00c853}
+.action.loading::after{content:'';width:16px;height:16px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;margin-left:8px}
+.result{margin-top:20px;padding:20px;background:var(--glass);backdrop-filter:blur(8px);border-radius:10px;border-left:5px solid var(--acc);min-height:60px;white-space:pre-wrap;font-family:'Courier New',monospace;font-size:15px;line-height:1.6;color:var(--dim);position:relative}
+.result.error{border-left-color:#ff4444;background:rgba(255,68,68,.08)}
+.result.success{border-left-color:#00c853;background:rgba(0,200,83,.06)}
+.copy-btn{position:absolute;top:10px;right:10px;padding:6px 12px;background:rgba(255,255,255,.1);border:1px solid var(--gb);color:var(--txt);border-radius:8px;cursor:pointer;font-size:12px;font-weight:bold;font-family:'Segoe UI',sans-serif}
+.copy-btn:hover{background:rgba(255,255,255,.2)}
+.hint{font-size:13px;color:var(--ddim);margin-top:10px}
+.tools-grid,.subjects-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:20px}
+.tool-card,.subject-card{padding:20px 14px;border-radius:16px;cursor:pointer;transition:.4s cubic-bezier(.25,.46,.45,.94);text-align:center;position:relative;overflow:hidden;background:var(--glass);backdrop-filter:blur(20px);border:1px solid var(--gb);box-shadow:0 8px 32px rgba(0,0,0,.2);color:var(--txt)}
+.subject-card{display:flex;flex-direction:column;align-items:center;gap:4px}
+.tool-card:hover,.subject-card:hover{transform:translateY(-6px) scale(1.02);box-shadow:0 16px 48px rgba(0,0,0,.4);border-color:rgba(118,75,162,.4)}
+.tool-card.active{background:rgba(118,75,162,.15);border-color:rgba(118,75,162,.5)}
+.tool-card h3,.subject-card h3{margin-bottom:6px;font-size:16px;font-weight:700}
+.tool-card p,.subject-card p{font-size:12px;opacity:.6}
+.subject-card .subject-emoji{font-size:32px;margin-bottom:4px}
+.tool-panel{display:none}
+.tool-panel.active{display:block;animation:pop .3s ease-out}
+.post-card{background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--gb);border-radius:12px;padding:20px;margin-bottom:15px;transition:.3s;color:var(--dim)}
+.post-card:hover{border-color:rgba(118,75,162,.4);transform:translateY(-2px)}
+.post-header{display:flex;justify-content:space-between;align-items:start;margin-bottom:10px;gap:10px}
+.post-category{display:inline-block;padding:3px 10px;background:var(--glass);border-radius:15px;font-size:12px;font-weight:bold;color:var(--ddim);margin-bottom:5px}
+.post-date{color:var(--ddim);font-size:12px}
+.post-content{line-height:1.6;color:var(--dim);word-break:break-word}
+.post-author{font-size:13px;color:var(--ddim);margin-top:8px}
+.post-actions{display:flex;gap:8px}
+.post-action-btn{background:none;border:none;cursor:pointer;font-size:16px;padding:4px 8px;border-radius:6px;transition:.3s;opacity:.6}
+.post-action-btn:hover{opacity:1;background:var(--glass)}
+.post-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:15px}
+.filter-chip{padding:6px 14px;background:var(--glass);border:1px solid var(--gb);border-radius:20px;font-size:13px;cursor:pointer;transition:.3s;color:var(--dim)}
+.filter-chip.active{background:rgba(118,75,162,.3);color:var(--txt);border-color:var(--acc)}
+.modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);z-index:1000;justify-content:center;align-items:center;backdrop-filter:blur(10px);padding:20px}
+.modal-overlay.active{display:flex}
+.modal{background:#1a1a35;border:2px solid #764ba2;border-radius:20px;padding:40px;max-width:520px;width:100%;position:relative;animation:pop .3s ease-out;max-height:90vh;overflow-y:auto;color:#fff;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.modal h2{margin-bottom:20px;text-align:center;color:#fff}
+.modal .close{position:absolute;top:15px;right:20px;font-size:28px;cursor:pointer;color:#aaa;border:none;background:none;transition:.3s;line-height:1}
+.modal .close:hover{color:#ff006e;transform:rotate(90deg)}
+.modal .auth-switch{text-align:center;margin-top:15px;color:rgba(255,255,255,.7);font-size:14px}
+.modal .auth-switch a{color:#00b0ff;cursor:pointer;font-weight:bold;text-decoration:underline}
+.modal .auth-switch a:hover{color:#fff}
+
+/* 🔴 Красная модалка регистрации */
+#authRegisterForm{background:linear-gradient(135deg,#7a0f1f 0%,#4a0010 100%);padding:20px;border-radius:14px;border:2px solid #ff1744;margin-top:10px}
+#authRegisterForm input{background:linear-gradient(135deg,#001f5c,#003080)!important;border:2px solid #2979ff!important;color:#fff!important;font-family:'Segoe UI',sans-serif!important;margin-bottom:12px}
+#authRegisterForm input::placeholder{color:rgba(255,255,255,.55)!important}
+#authRegisterForm input:focus{border-color:#00b0ff!important;box-shadow:0 0 0 4px rgba(41,121,255,.4),0 0 20px rgba(41,121,255,.6)!important;background:linear-gradient(135deg,#002a7a,#0040a0)!important}
+#authRegisterForm .auth-switch{color:rgba(255,255,255,.75)}
+#authRegisterForm .auth-switch a{color:#ff8a9a}
+#authRegisterForm .auth-switch a:hover{color:#fff;text-shadow:0 0 10px rgba(255,138,154,.8)}
+#registerBtn{background:linear-gradient(135deg,#2979ff,#0d47a1)!important;box-shadow:0 6px 20px rgba(41,121,255,.5)}
+#registerBtn:hover:not(:disabled){background:linear-gradient(135deg,#448aff,#1565c0)!important;box-shadow:0 8px 25px rgba(41,121,255,.7)}
+#authRegisterForm h2{color:#fff;text-shadow:0 2px 10px rgba(255,23,68,.8)}
+
+/* Обычные модалки — фиолетовые поля */
+#authLoginForm input,#supportModal input,#supportModal textarea,#supportModal select{background:#1e1e3a!important;border:2px solid rgba(118,75,162,.5)!important;color:#fff!important;font-family:'Segoe UI',sans-serif!important;margin-bottom:12px}
+#authLoginForm input::placeholder,#supportModal input::placeholder,#supportModal textarea::placeholder{color:rgba(255,255,255,.5)!important}
+#authLoginForm input:focus,#supportModal input:focus,#supportModal textarea:focus{border-color:#764ba2!important;box-shadow:0 0 0 4px rgba(118,75,162,.3)!important;background:#252550!important}
+
+/* Светлая тема — поля в модалках */
+body.light .modal{background:#fff;border-color:#764ba2;color:#1a1a2e}
+body.light .modal h2{color:#1a1a2e}
+body.light #authRegisterForm input{background:#fff!important;border-color:#2979ff!important;color:#1a1a2e!important}
+body.light #authLoginForm input,body.light #supportModal input,body.light #supportModal textarea{background:#fff!important;border-color:#764ba2!important;color:#1a1a2e!important}
+body.light #authLoginForm input::placeholder{color:rgba(0,0,0,.4)!important}
+
+.dev-info{text-align:center}
+.dev-avatar{width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;display:flex;align-items:center;justify-content:center;font-size:48px;font-weight:bold;margin:0 auto 20px;box-shadow:0 5px 20px rgba(118,75,162,.4)}
+.dev-name{font-size:24px;font-weight:bold;margin-bottom:5px}
+.dev-role{color:var(--ddim);margin-bottom:25px}
+.social-links{display:flex;flex-direction:column;gap:12px}
+.social-link{display:flex;align-items:center;gap:12px;padding:12px 18px;background:var(--glass);border-radius:12px;text-decoration:none;color:var(--txt);transition:.3s;border:1px solid var(--gb)}
+.social-link:hover{background:rgba(118,75,162,.15);transform:translateX(5px);border-color:var(--acc)}
+.social-icon{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:bold;flex-shrink:0}
+.social-text{display:flex;flex-direction:column;text-align:left}
+.social-label{font-size:11px;opacity:.5}
+.social-value{font-weight:bold}
+.chat-toggle{position:fixed;bottom:25px;right:25px;width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#ff006e,#764ba2);color:#fff;border:none;font-size:28px;cursor:pointer;box-shadow:0 5px 20px rgba(0,0,0,.4);z-index:500;transition:.3s}
+.chat-toggle:hover{transform:scale(1.1)}
+.chat-window{position:fixed;bottom:100px;right:25px;width:350px;max-height:500px;background:#1a1a35;border:2px solid #764ba2;border-radius:20px;box-shadow:0 10px 40px rgba(0,0,0,.6);display:none;flex-direction:column;overflow:hidden;z-index:500}
+.chat-window.active{display:flex;animation:pop .3s ease-out}
+.chat-header{padding:15px;background:rgba(118,75,162,.3);color:#fff;font-weight:bold;border-bottom:1px solid var(--gb);display:flex;justify-content:space-between;align-items:center}
+.chat-messages{flex:1;padding:15px;overflow-y:auto;max-height:350px;background:rgba(0,0,0,.3);display:flex;flex-direction:column;gap:8px}
+.chat-msg{padding:10px 14px;border-radius:15px;max-width:85%;word-wrap:break-word;font-size:14px}
+.chat-msg.bot{background:#252550;border:1px solid var(--gb);align-self:flex-start;border-bottom-left-radius:4px;color:#ddd}
+.chat-msg.user{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;margin-left:auto;border-bottom-right-radius:4px}
+.chat-input-wrap{display:flex;padding:10px;gap:8px;border-top:1px solid var(--gb)}
+.chat-input-wrap input{flex:1;padding:10px 15px;background:#252550!important;border:2px solid #764ba2!important;border-radius:20px;font-size:14px;font-family:'Segoe UI',sans-serif;color:#fff!important;margin:0!important}
+.chat-input-wrap input::placeholder{color:rgba(255,255,255,.4)!important}
+.chat-input-wrap button{padding:10px 18px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;border-radius:20px;cursor:pointer;font-weight:bold;transition:.3s}
+.chat-input-wrap button:hover{transform:scale(1.05)}
+#welcomeOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.92);z-index:99999;display:flex;justify-content:center;align-items:center;backdrop-filter:blur(12px);padding:20px}
+#welcomeOverlay .welcome-box{background:#1a1a35;border:2px solid #764ba2;border-radius:25px;padding:50px;max-width:450px;width:100%;text-align:center;animation:pop .4s ease-out;box-shadow:0 30px 80px rgba(0,0,0,.6);color:#fff}
+#welcomeOverlay .emoji{font-size:72px;margin-bottom:10px}
+#welcomeOverlay h2{margin-bottom:15px;font-size:28px;color:#fff}
+#welcomeOverlay p{font-size:18px;color:#ccc;line-height:1.6;margin-bottom:8px}
+#welcomeOverlay .sub{font-size:14px;color:rgba(255,255,255,.5);margin-bottom:25px}
+#welcomeOverlay .actions{display:flex;gap:15px;justify-content:center;flex-wrap:wrap}
+#welcomeOverlay .btn-skip,#welcomeOverlay .btn-login{padding:14px 40px;border:none;border-radius:12px;font-size:17px;font-weight:bold;cursor:pointer;transition:.3s}
+#welcomeOverlay .btn-skip{background:rgba(255,255,255,.1);color:#ccc;border:1px solid var(--gb)}
+#welcomeOverlay .btn-skip:hover{background:rgba(255,255,255,.2)}
+#welcomeOverlay .btn-login{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;box-shadow:0 4px 15px rgba(118,75,162,.4)}
+#welcomeOverlay .btn-login:hover{transform:translateY(-2px)}
+.profile-field{margin-bottom:15px}
+.profile-field label{display:block;font-weight:bold;margin-bottom:5px;color:var(--ddim);font-size:14px}
+.profile-field input[readonly]{background:rgba(255,255,255,.03)!important;cursor:not-allowed;color:var(--ddim)!important;border-color:rgba(255,255,255,.1)!important}
+.profile-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.admin-panel{background:var(--glass);backdrop-filter:blur(12px);border:1px solid rgba(255,0,110,.2);border-radius:15px;padding:20px;margin-top:20px}
+.admin-panel h3{color:#ff006e;margin-bottom:15px}
+.creator-self{background:var(--glass);border:1px solid var(--gb);border-radius:12px;padding:15px;margin-bottom:15px}
+.user-list-item{display:flex;justify-content:space-between;align-items:center;padding:12px 15px;background:rgba(255,255,255,.02);border-radius:10px;margin-bottom:8px;border:1px solid var(--gb);flex-wrap:wrap;gap:10px;color:var(--dim)}
+.user-list-item .user-info{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.user-list-item .user-actions{display:flex;gap:8px;flex-wrap:wrap}
+.user-list-item .user-actions select{width:auto;padding:6px 12px;font-size:13px;min-width:180px;font-family:'Segoe UI',sans-serif;background:#252550!important;color:#fff!important;border:2px solid #764ba2!important;margin:0!important}
+.user-list-item .user-actions button{padding:6px 14px;font-size:13px;border:none;border-radius:8px;cursor:pointer;font-weight:bold;transition:.3s;color:#fff}
+.btn-ban{background:#ff4444}.btn-ban:hover{background:#cc0000}
+.btn-unban{background:#00c853}.btn-unban:hover{background:#00a844}
+.btn-save-rank{background:#667eea}.btn-save-rank:hover{background:#764ba2}
+.rank-legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;margin:10px 0 15px;padding:10px;background:rgba(255,255,255,.02);border-radius:10px}
+.rank-legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--dim)}
+#resetCreatorBtn{position:fixed;bottom:180px;left:25px;padding:12px 22px;background:linear-gradient(135deg,#ff006e,#ff4444);color:#fff;border:none;border-radius:12px;cursor:pointer;font-weight:bold;z-index:999;font-size:14px;box-shadow:0 4px 20px rgba(255,0,110,.4);display:none}
+.show-welcome-btn{position:fixed;bottom:100px;left:25px;padding:12px 20px;background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--gb);border-radius:15px;cursor:pointer;font-weight:bold;color:var(--txt);z-index:400;transition:.3s}
+.history-list{max-height:200px;overflow-y:auto}
+.history-item{padding:8px 12px;background:var(--glass);border-radius:8px;margin-bottom:6px;cursor:pointer;font-size:13px;border-left:3px solid var(--acc);transition:.3s;color:var(--dim);font-family:'Courier New',monospace}
+.history-item:hover{background:rgba(118,75,162,.15);transform:translateX(3px)}
+@media(max-width:768px){.header h1{font-size:48px}.header-controls{position:static;justify-content:center;margin-top:15px}.tabs .tab{min-width:100px;font-size:14px;padding:12px}.card{padding:20px}.tools-grid,.subjects-grid{grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px}.chat-window{width:calc(100vw - 20px);right:10px;bottom:90px}.show-welcome-btn{display:none}.modal{padding:25px}}
+@media(max-width:480px){.header h1{font-size:36px}.tab{font-size:12px;padding:10px;min-width:70px}.controls{flex-direction:column}.controls select{min-width:unset}.login-banner{flex-direction:column;text-align:center}}
+</style>
+</head>
+<body>
+
+<div id="welcomeOverlay">
+  <div class="welcome-box">
+    <div class="emoji">👋</div>
+    <h2>Добро пожаловать в SoloGDZ!</h2>
+    <p>⚠️ Вы не авторизованы, некоторые функции могут не работать.</p>
+    <p class="sub">(Публикация постов доступна только авторизованным)</p>
+    <div class="actions">
+      <button class="btn-skip" onclick="closeWelcome()">Пропустить</button>
+      <button class="btn-login" onclick="closeWelcomeAndLogin()">Войти</button>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="header">
+    <h1>SoloGDZ</h1>
+    <p>🔥 решалка всего, потому что лень делать самому 🔥</p>
+    <div class="header-controls">
+      <button class="dev-btn" onclick="toggleTheme()" id="themeBtn" title="Сменить тему">🌓</button>
+      <button class="dev-btn" onclick="openDev()">👨‍💻 О разработчике</button>
+      <button class="dev-btn" onclick="openSupport()">🛠️ Техподдержка</button>
+    </div>
+  </div>
+
+  <div id="authBanner" class="login-banner">
+    <span class="user-info" id="userDisplay">🔒 Вы не авторизованы</span>
+    <div>
+      <button class="login-btn" id="authBtn" onclick="openAuth()">Войти</button>
+      <button class="login-btn logout" id="logoutBtn" style="display:none;" onclick="logout()">Выйти</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('math', event)">🧮 Математика</button>
+    <button class="tab" onclick="switchTab('translate', event)">🌍 Перевод</button>
+    <button class="tab" onclick="switchTab('programming', event)">💻 Код</button>
+    <button class="tab" onclick="switchTab('subjects', event)">📚 Предметы</button>
+    <button class="tab" onclick="switchTab('community', event)">📰 Сообщество</button>
+    <button class="tab" onclick="switchTab('profile', event)">👤 Профиль</button>
+  </div>
+
+  <div class="card">
+    <!-- МАТЕМАТИКА -->
+    <div id="math" class="section active">
+      <h2 style="margin-bottom:15px;">🧮 Решалка примеров</h2>
+      <textarea id="mathInput" rows="3" placeholder="Напиши пример: 2+2*2, sqrt(16), x^2-4=0, sin(pi/2)"></textarea>
+      <div class="hint">Подсказки: +, -, *, /, ^ (степень), sqrt(), sin(), cos(), log(), pi, e. Уравнения через =</div>
+      <div class="controls">
+        <button class="action" id="mathSolveBtn" onclick="solveMath()">Решить 🚀</button>
+        <button class="action secondary" onclick="clearHistory()">🗑 Очистить историю</button>
+      </div>
+      <div class="result" id="mathResult">Здесь появится ответ...</div>
+      <div style="margin-top:20px;">
+        <h4 style="margin-bottom:10px; color:var(--acc);">📜 История (последние 10)</h4>
+        <div class="history-list" id="mathHistory">
+          <div style="color:var(--ddim);font-size:13px;">История пуста</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ПЕРЕВОД -->
+    <div id="translate" class="section">
+      <h2 style="margin-bottom:15px;">🌍 Переводчик всего</h2>
+      <textarea id="translateInput" rows="4" placeholder="Вставь любой текст на любом языке..."></textarea>
+      <div class="controls">
+        <select id="fromLang">
+          <option value="auto">🔍 Авто-определение</option>
+          <option value="ru">Русский</option><option value="en">Английский</option>
+          <option value="de">Немецкий</option><option value="fr">Французский</option>
+          <option value="es">Испанский</option><option value="it">Итальянский</option>
+          <option value="zh">Китайский</option><option value="ja">Японский</option>
+          <option value="ko">Корейский</option><option value="ar">Арабский</option>
+          <option value="tr">Турецкий</option><option value="uk">Украинский</option>
+          <option value="pl">Польский</option>
+        </select>
+        <select id="toLang">
+          <option value="ru">Русский</option><option value="en">Английский</option>
+          <option value="de">Немецкий</option><option value="fr">Французский</option>
+          <option value="es">Испанский</option><option value="it">Итальянский</option>
+          <option value="zh">Китайский</option><option value="ja">Японский</option>
+          <option value="ko">Корейский</option><option value="ar">Арабский</option>
+          <option value="tr">Турецкий</option><option value="uk">Украинский</option>
+          <option value="pl">Польский</option>
+        </select>
+      </div>
+      <button class="action" id="translateBtn" onclick="translateText()">Перевести 🌐</button>
+      <div class="result" id="translateResult">Здесь появится перевод...</div>
+    </div>
+
+    <!-- ПРОГРАММИРОВАНИЕ -->
+    <div id="programming" class="section">
+      <h2 style="margin-bottom:15px;">💻 Инструменты программиста</h2>
+      <div class="tools-grid">
+        <div class="tool-card active" onclick="switchTool('base', event)">🔢 Системы счисления</div>
+        <div class="tool-card" onclick="switchTool('prime', event)">🔍 Простое число?</div>
+        <div class="tool-card" onclick="switchTool('factorial', event)">❗ Факториал</div>
+        <div class="tool-card" onclick="switchTool('fibonacci', event)">🌀 Фибоначчи</div>
+        <div class="tool-card" onclick="switchTool('modulo', event)">➗ Остаток %</div>
+        <div class="tool-card" onclick="switchTool('code', event)">📝 Генератор кода</div>
+      </div>
+      <div id="tool-base" class="tool-panel active">
+        <input type="text" id="baseInput" placeholder="Введи число (например: 255)">
+        <div class="controls">
+          <select id="baseFrom">
+            <option value="10">Из 10-й (десятичная)</option>
+            <option value="2">Из 2-й (двоичная)</option>
+            <option value="8">Из 8-й (восьмеричная)</option>
+            <option value="16">Из 16-й (шестнадцатеричная)</option>
+          </select>
+        </div>
+        <button class="action" onclick="convertBase()">Конвертировать 🔄</button>
+        <div class="result" id="baseResult">Здесь появятся все представления числа...</div>
+      </div>
+      <div id="tool-prime" class="tool-panel">
+        <input type="number" id="primeInput" placeholder="Введи число">
+        <button class="action" onclick="checkPrime()">Проверить 🔎</button>
+        <div class="result" id="primeResult">Проверю, простое ли число...</div>
+      </div>
+      <div id="tool-factorial" class="tool-panel">
+        <input type="number" id="factInput" placeholder="Введи число (например: 10)" min="0" max="170">
+        <button class="action" onclick="calcFactorial()">Посчитать ❗</button>
+        <div class="result" id="factResult">Вычислю факториал...</div>
+      </div>
+      <div id="tool-fibonacci" class="tool-panel">
+        <input type="number" id="fibInput" placeholder="Номер числа (например: 10)" min="1" max="78">
+        <button class="action" onclick="calcFibonacci()">Посчитать 🌀</button>
+        <div class="result" id="fibResult">Вычислю число Фибоначчи...</div>
+      </div>
+      <div id="tool-modulo" class="tool-panel">
+        <div style="display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap;">
+          <input type="number" id="modA" placeholder="Делимое (17)" style="flex:1;min-width:100px;">
+          <span style="font-size:24px;align-self:center;font-weight:bold;">%</span>
+          <input type="number" id="modB" placeholder="Делитель (5)" style="flex:1;min-width:100px;">
+        </div>
+        <button class="action" onclick="calcModulo()">Вычислить остаток ➗</button>
+        <div class="result" id="modResult">Здесь появится результат...</div>
+      </div>
+      <div id="tool-code" class="tool-panel">
+        <select id="codeTemplate">
+          <option value="hello">Hello World</option>
+          <option value="sum">Сумма чисел</option>
+          <option value="factorial">Факториал (функция)</option>
+          <option value="fibonacci">Фибоначчи (функция)</option>
+          <option value="sort">Сортировка списка</option>
+          <option value="palindrome">Проверка палиндрома</option>
+          <option value="prime">Простое число (функция)</option>
+          <option value="modulo">Остаток от деления (%)</option>
+        </select>
+        <button class="action" onclick="generateCode()">Сгенерировать 💻</button>
+        <div class="result" id="codeResult">Выбери шаблон и нажми кнопку...</div>
+      </div>
+    </div>
+
+    <!-- ПРЕДМЕТЫ -->
+    <div id="subjects" class="section">
+      <h2 style="margin-bottom:15px;">📚 Все школьные предметы</h2>
+      <p style="color:var(--ddim);margin-bottom:15px;">Выбери предмет для получения помощи с ГДЗ</p>
+      <div class="subjects-grid" id="subjectsGrid"></div>
+      <div id="selectedSubject" style="display:none;margin-top:20px;padding:20px;background:var(--glass);border-radius:16px;border:1px solid var(--gb);">
+        <h3 style="margin-bottom:10px;">📖 Предмет: <span id="subjectName" style="color:var(--acc);"></span></h3>
+        <p style="color:var(--ddim);">Введи номер задания или пример:</p>
+        <div class="gdz-solver active" id="gdzSolver">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <input type="text" id="gdzInput" placeholder="Например: 2x+5=13" style="flex:1;">
+            <button class="action" onclick="solveGdz()">Решить 🚀</button>
+          </div>
+          <div class="result" id="gdzResult">Введи задание и нажми "Решить"</div>
+        </div>
+        <div id="gdzContainer" style="margin-top:15px;">
+          <h4 style="color:var(--acc);margin-bottom:10px;">📝 Готовые ответы</h4>
+          <div id="gdzContent" class="result">Загрузка...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- СООБЩЕСТВО -->
+    <div id="community" class="section">
+      <h2 style="margin-bottom:15px;">📰 Новости и сообщество</h2>
+      <div style="background:var(--glass);padding:20px;border-radius:16px;margin-bottom:20px;border:1px solid var(--gb);">
+        <h3 style="margin-bottom:15px;">✍️ Добавить пост</h3>
+        <input type="text" id="postTitle" placeholder="Заголовок поста" style="margin-bottom:10px;" maxlength="100">
+        <textarea id="postContent" rows="3" placeholder="Текст поста..." maxlength="2000" oninput="updatePostCounter()"></textarea>
+        <div style="text-align:right;font-size:12px;color:var(--ddim);margin-top:5px;">
+          <span id="postCounter">0</span> / 2000
+        </div>
+        <div class="controls" style="margin-top:10px;">
+          <select id="postCategory">
+            <option value="news">📢 Новость</option>
+            <option value="question">❓ Вопрос</option>
+            <option value="tip">💡 Совет</option>
+            <option value="discussion">💬 Обсуждение</option>
+          </select>
+          <button class="action" id="publishBtn" onclick="addPost()">Опубликовать 🚀</button>
+        </div>
+        <div id="publishWarning" style="color:#ff4444;margin-top:8px;">⚠️ Для публикации нужно войти в аккаунт.</div>
+      </div>
+      <h3 style="margin-bottom:15px;">📋 Лента сообщества</h3>
+      <input type="text" id="postSearch" placeholder="🔍 Поиск постов..." style="margin-bottom:10px;" oninput="debouncedLoadPosts()">
+      <div class="post-filters" id="postFilters">
+        <div class="filter-chip active" data-cat="all" onclick="filterPosts('all', event)">Все</div>
+        <div class="filter-chip" data-cat="news" onclick="filterPosts('news', event)">📢 Новости</div>
+        <div class="filter-chip" data-cat="question" onclick="filterPosts('question', event)">❓ Вопросы</div>
+        <div class="filter-chip" data-cat="tip" onclick="filterPosts('tip', event)">💡 Советы</div>
+        <div class="filter-chip" data-cat="discussion" onclick="filterPosts('discussion', event)">💬 Обсуждения</div>
+      </div>
+      <div id="postsList">
+        <div class="result" style="text-align:center;color:var(--ddim);">Пока нет постов. Будь первым! 🎉</div>
+      </div>
+    </div>
+
+    <!-- ПРОФИЛЬ -->
+    <div id="profile" class="section">
+      <h2 style="margin-bottom:15px;">👤 Мой профиль</h2>
+      <div id="profileNotLogged" style="text-align:center;padding:40px 20px;">
+        <div style="font-size:64px;margin-bottom:15px;">🔒</div>
+        <h3 style="color:var(--acc);margin-bottom:10px;">Вы не авторизованы</h3>
+        <p style="color:var(--ddim);margin-bottom:20px;">Войдите или зарегистрируйтесь</p>
+        <button class="action" onclick="openAuth()">Войти</button>
+        <button class="action secondary" onclick="openRegister()" style="margin-left:10px;">Зарегистрироваться</button>
+      </div>
+      <div id="profileLogged" style="display:none;">
+        <div style="background:var(--glass);padding:25px;border-radius:16px;border:1px solid var(--gb);margin-bottom:20px;">
+          <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+            <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:bold;">
+              <span id="profileAvatar">?</span>
+            </div>
+            <div>
+              <h3 id="profileName">Имя пользователя</h3>
+              <p id="profileRank" style="color:var(--ddim);">Роль: Пользователь</p>
+              <p id="profileLogin" style="color:var(--ddim);font-size:14px;">Логин: —</p>
+            </div>
+          </div>
+        </div>
+        <h3 style="margin-bottom:15px;">📋 Информация аккаунта</h3>
+        <div class="profile-field">
+          <label>Имя пользователя</label>
+          <input type="text" id="profileEditUsername">
+        </div>
+        <div class="profile-field">
+          <label>Логин</label>
+          <input type="text" id="profileEditLogin" readonly>
+        </div>
+        <div class="profile-field">
+          <label>Роль</label>
+          <input type="text" id="profileEditRank" readonly>
+        </div>
+        <button class="action success" onclick="saveProfileName()">💾 Сохранить имя</button>
+        <h3 style="margin:20px 0 15px;">🔑 Смена пароля</h3>
+        <div class="profile-field">
+          <label>Новый пароль</label>
+          <input type="password" id="profileNewPassword" placeholder="Введите новый пароль">
+        </div>
+        <div class="profile-field">
+          <label>Подтвердите пароль</label>
+          <input type="password" id="profileNewPasswordConfirm" placeholder="Повторите пароль">
+        </div>
+        <button class="action" onclick="changePassword()">Сменить пароль 🔑</button>
+        <div id="adminPanel" style="display:none;" class="admin-panel">
+          <h3>👑 Админ-панель</h3>
+          <p style="color:var(--ddim);margin-bottom:15px;">Управляйте рангами и блокировкой</p>
+          <div class="rank-legend">
+            <span class="rank-legend-item"><span class="rank-badge rank-creator">👑 Создатель</span></span>
+            <span class="rank-legend-item"><span class="rank-badge rank-owner">⭐ Владелец</span></span>
+            <span class="rank-legend-item"><span class="rank-badge rank-legend">🏆 Легенда</span></span>
+            <span class="rank-legend-item"><span class="rank-badge rank-friend">🤝 Друг</span></span>
+            <span class="rank-legend-item"><span class="rank-badge rank-helper">🛠️ Помощник</span></span>
+            <span class="rank-legend-item"><span class="rank-badge rank-head-admin">👑 Гл. админ</span></span>
+            <span class="rank-legend-item"><span class="rank-badge rank-admin">🛡️ Админ</span></span>
+            <span class="rank-legend-item"><span class="rank-badge rank-moderator">⚖️ Модератор</span></span>
+            <span class="rank-legend-item"><span class="rank-badge rank-senior">🌟 Старший</span></span>
+            <span class="rank-legend-item"><span class="rank-badge rank-member">💎 Участник</span></span>
+            <span class="rank-legend-item"><span class="rank-badge rank-user">👤 Пользователь</span></span>
+            <span class="rank-legend-item"><span class="rank-badge rank-newbie">🌱 Новичок</span></span>
+            <span class="rank-legend-item"><span class="rank-badge rank-guest">👋 Гость</span></span>
+            <span class="rank-legend-item"><span class="rank-badge rank-banned">🚫 Забанен</span></span>
+          </div>
+          <div class="creator-self">
+            <label>👤 Ваш текущий ранг: <strong id="creatorCurrentRank" style="color:var(--acc);">Создатель</strong></label>
+            <div class="controls">
+              <select id="creatorRankSelect"></select>
+              <button class="action success" onclick="changeCreatorRank()">Изменить ранг 🔄</button>
+            </div>
+            <p style="font-size:13px;color:var(--ddim);margin-top:8px;">💡 Панель всегда доступна для создателя!</p>
+          </div>
+          <h4 style="margin:15px 0 10px;">📋 Все пользователи</h4>
+          <div id="userList"></div>
+        </div>
+        <div class="profile-actions" style="margin-top:20px;padding-top:20px;border-top:1px solid var(--gb);">
+          <button class="action danger" id="deleteAccountBtn" onclick="deleteAccount()">🗑️ Удалить аккаунт</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<button id="resetCreatorBtn" onclick="resetCreator()">🔄 Вернуть панель создателя</button>
+<button class="show-welcome-btn" onclick="openWelcome()">👋 Показать окно</button>
+
+<div class="modal-overlay" id="devModal">
+  <div class="modal">
+    <button class="close" onclick="closeDev()">×</button>
+    <div class="dev-info">
+      <div class="dev-avatar">СК</div>
+      <div class="dev-name">Кисурин Степан</div>
+      <div class="dev-role">💻 Разработчик SoloGDZ</div>
+      <div class="social-links">
+        <a href="#" class="social-link"><div class="social-icon">VK</div><div class="social-text"><span class="social-label">ВКонтакте</span><span class="social-value">Степан Кисурин</span></div></a>
+        <a href="#" class="social-link"><div class="social-icon">MX</div><div class="social-text"><span class="social-label">MAX</span><span class="social-value">+79089145684</span></div></a>
+        <a href="mailto:stepan.20172008@gmail.com" class="social-link"><div class="social-icon">@</div><div class="social-text"><span class="social-label">Gmail</span><span class="social-value">stepan.20172008@gmail.com</span></div></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="supportModal">
+  <div class="modal">
+    <button class="close" onclick="closeSupport()">×</button>
+    <h2>🛠️ Техподдержка</h2>
+    <p style="text-align:center;color:var(--ddim);margin-bottom:20px;">Нашли баг? Напишите!</p>
+    <form id="supportForm" action="https://formsubmit.co/stepan.20172008@gmail.com" method="POST">
+      <input type="hidden" name="_subject" value="Новый отзыв SoloGDZ!">
+      <input type="hidden" name="_captcha" value="false">
+      <input type="hidden" name="_template" value="table">
+      <input type="text" name="_honey" style="display:none">
+      <div style="margin-bottom:15px;">
+        <label style="display:block;margin-bottom:5px;font-weight:bold;color:#ccc;">Ваше имя</label>
+        <input type="text" name="Имя" required placeholder="Как к вам обращаться?">
+      </div>
+      <div style="margin-bottom:15px;">
+        <label style="display:block;margin-bottom:5px;font-weight:bold;color:#ccc;">Email</label>
+        <input type="email" name="Email" placeholder="your@email.com">
+      </div>
+      <div style="margin-bottom:15px;">
+        <label style="display:block;margin-bottom:5px;font-weight:bold;color:#ccc;">Тип</label>
+        <select name="Тип">
+          <option>💡 Предложение</option><option>🐛 Баг</option>
+          <option>❓ Вопрос</option><option>❤️ Благодарность</option>
+          <option>🔥 Другое</option>
+        </select>
+      </div>
+      <div style="margin-bottom:15px;">
+        <label style="display:block;margin-bottom:5px;font-weight:bold;color:#ccc;">Сообщение</label>
+        <textarea name="Сообщение" rows="5" required placeholder="Опишите..."></textarea>
+      </div>
+      <button type="submit" class="action" style="width:100%;">Отправить 🚀</button>
+    </form>
+    <div id="supportSuccess" style="display:none;text-align:center;padding:20px;">
+      <div style="font-size:64px;">✅</div>
+      <h3 style="color:var(--acc);margin:15px 0;">Спасибо!</h3>
+      <p style="color:var(--ddim);">Сообщение отправлено.</p>
+      <button class="action" onclick="closeSupport()" style="margin-top:20px;">Закрыть</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="authModal">
+  <div class="modal">
+    <button class="close" onclick="closeAuth()">×</button>
+    <div id="authFormContainer">
+      <h2 id="authModalTitle">🔐 Вход в аккаунт</h2>
+      <div id="authLoginForm">
+        <input type="text" id="loginUsername" placeholder="Логин или email">
+        <input type="password" id="loginPassword" placeholder="Пароль">
+        <button class="action" id="loginBtn" style="width:100%;" onclick="login()">Войти</button>
+        <div style="text-align:center;margin:15px 0;color:var(--ddim);">— или —</div>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+          <button class="action" style="flex:1;background:#4a76a8;" onclick="socialLogin('vk')">VK</button>
+          <button class="action" style="flex:1;background:#ea4335;" onclick="socialLogin('google')">Google</button>
+          <button class="action" style="flex:1;background:#005ff9;" onclick="socialLogin('mail')">Mail.ru</button>
+        </div>
+        <div id="authError" style="color:#ff4444;text-align:center;margin-top:12px;display:none;"></div>
+        <div class="auth-switch">Нет аккаунта? <a onclick="switchToRegister()">Зарегистрироваться</a></div>
+      </div>
+      <div id="authRegisterForm" style="display:none;">
+        <input type="text" id="registerUsername" placeholder="Имя (отображается)">
+        <input type="text" id="registerLogin" placeholder="Логин (для входа)">
+        <input type="email" id="registerEmail" placeholder="Email (необязательно)">
+        <input type="password" id="registerPassword" placeholder="Пароль (мин. 6 символов)">
+        <input type="password" id="registerPasswordConfirm" placeholder="Подтвердите пароль">
+        <button class="action" id="registerBtn" style="width:100%;" onclick="register()">Зарегистрироваться 🚀</button>
+        <div id="registerError" style="color:#ff8a9a;text-align:center;margin-top:12px;display:none;"></div>
+        <div class="auth-switch">Уже есть аккаунт? <a onclick="switchToLogin()">Войти</a></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<button class="chat-toggle" onclick="toggleChat()">💬</button>
+<div class="chat-window" id="chatWindow">
+  <div class="chat-header">
+    <span>🤖 Помощник SoloGDZ</span>
+    <button onclick="toggleChat()" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;">×</button>
+  </div>
+  <div class="chat-messages" id="chatMessages">
+    <div class="chat-msg bot">Привет! Я помощник SoloGDZ. Спроси что-нибудь! 😊</div>
+  </div>
+  <div class="chat-input-wrap">
+    <input type="text" id="chatInput" placeholder="Задай вопрос..." onkeydown="if(event.key==='Enter')sendChat()">
+    <button onclick="sendChat()">➤</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+const CONFIG={SESSION_TIMEOUT:864e5,MAX_POST:2000,MAX_TITLE:100,MAX_HISTORY:10,MIN_PASS:6,SUPPORT_COOLDOWN:6e4,CREATOR:'Stepan_Kisurin'};
+const RANKS=[
+{v:'Создатель',e:'👑',l:'Создатель',c:'rank-creator'},
+{v:'Владелец',e:'⭐',l:'Владелец',c:'rank-owner'},
+{v:'Легенда проекта',e:'🏆',l:'Легенда',c:'rank-legend'},
+{v:'Друг проекта',e:'🤝',l:'Друг проекта',c:'rank-friend'},
+{v:'Помощник проекта',e:'🛠️',l:'Помощник',c:'rank-helper'},
+{v:'Главный администратор',e:'👑',l:'Гл. админ',c:'rank-head-admin'},
+{v:'Администратор',e:'🛡️',l:'Администратор',c:'rank-admin'},
+{v:'Модератор',e:'⚖️',l:'Модератор',c:'rank-moderator'},
+{v:'Старший',e:'🌟',l:'Старший',c:'rank-senior'},
+{v:'Участник',e:'💎',l:'Участник',c:'rank-member'},
+{v:'Пользователь',e:'👤',l:'Пользователь',c:'rank-user'},
+{v:'Новичок',e:'🌱',l:'Новичок',c:'rank-newbie'},
+{v:'Гость',e:'👋',l:'Гость',c:'rank-guest'}];
+const SUBJECTS=[
+{n:'Алгебра',e:'🔢',g:'7-11'},{n:'Геометрия',e:'📐',g:'7-11'},
+{n:'Русский язык',e:'✍️',g:'1-11'},{n:'Литература',e:'📖',g:'5-11'},
+{n:'Английский язык',e:'🇬🇧',g:'2-11'},{n:'Немецкий язык',e:'🇩🇪',g:'2-11'},
+{n:'История',e:'🏛️',g:'5-11'},{n:'Обществознание',e:'👥',g:'6-11'},
+{n:'География',e:'🌍',g:'5-11'},{n:'Биология',e:'🧬',g:'5-11'},
+{n:'Химия',e:'⚗️',g:'8-11'},{n:'Физика',e:'⚛️',g:'7-11'},
+{n:'Информатика',e:'💻',g:'7-11'},{n:'ОБЖ',e:'🛡️',g:'5-11'},
+{n:'Технология',e:'🔧',g:'5-11'},{n:'Музыка',e:'🎵',g:'1-9'}];
+
+const U={
+esc(s){if(typeof s!=='string')return'';const m={'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'};return s.replace(/[&<>"']/g,c=>m[c])},
+async hash(p){try{const d=new TextEncoder().encode(p+'_sgdz_v2');const b=await crypto.subtle.digest('SHA-256',d);return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){let h=0;for(let i=0;i<p.length;i++){h=((h<<5)-h)+p.charCodeAt(i);h|=0}return'fb_'+Math.abs(h).toString(16)+'_'+p.length}},
+deb(fn,d=300){let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),d)}},
+date(iso){const d=new Date(iso);const diff=(Date.now()-d)/1000;if(diff<60)return'только что';if(diff<3600)return Math.floor(diff/60)+' мин. назад';if(diff<86400)return Math.floor(diff/3600)+' ч. назад';if(diff<604800)return Math.floor(diff/86400)+' дн. назад';return d.toLocaleString('ru-RU')},
+badge(r){if(!r)return'<span class="rank-badge rank-user">👤 Пользователь</span>';if(r==='Забанен')return'<span class="rank-badge rank-banned">🚫 Забанен</span>';const f=RANKS.find(x=>x.v===r);return f?`<span class="rank-badge ${f.c}">${f.e} ${f.l}</span>`:`<span class="rank-badge rank-user">👤 ${U.esc(r)}</span>`},
+uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8)},
+copy(t){if(navigator.clipboard)return navigator.clipboard.writeText(t);const ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy')}catch(e){}document.body.removeChild(ta);return Promise.resolve()}};
+
+const Toast={box:null,init(){if(this.box)return;this.box=document.createElement('div');this.box.style.cssText='position:fixed;top:20px;right:20px;z-index:100000;display:flex;flex-direction:column;gap:10px;pointer-events:none;';document.body.appendChild(this.box)},
+show(msg,type='info',dur=3000){this.init();const c={success:'#00c853',error:'#ff4444',warning:'#ff8800',info:'#667eea'}[type];const ic={success:'✅',error:'❌',warning:'⚠️',info:'ℹ️'}[type];const t=document.createElement('div');t.style.cssText=`background:rgba(20,20,35,.97);backdrop-filter:blur(20px);border-left:4px solid ${c};color:#fff;padding:14px 20px;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.5);min-width:250px;max-width:400px;animation:slideIn .3s ease-out;pointer-events:auto;font-size:14px;display:flex;align-items:center;gap:10px;line-height:1.4;`;t.innerHTML=`<span style="font-size:18px;">${ic}</span><span>${U.esc(msg)}</span>`;this.box.appendChild(t);setTimeout(()=>{t.style.animation='slideOut .3s ease-in';setTimeout(()=>t.remove(),300)},dur)},
+success(m){this.show(m,'success')},error(m){this.show(m,'error',5000)},warning(m){this.show(m,'warning',4000)},info(m){this.show(m,'info')}};
+
+const App={user:null,subject:'',filter:'all',history:[]};
+
+const Store={UK:'sgdz_users_v2',SK:'sgdz_session_v2',
+users(){try{return JSON.parse(localStorage.getItem(this.UK)||'[]')}catch(e){return[]}},
+save(u){localStorage.setItem(this.UK,JSON.stringify(u))},
+async ensureCreator(){const us=this.users();if(!us.some(u=>u.login===CONFIG.CREATOR)){us.push({username:'Кисурин Степан',login:CONFIG.CREATOR,passwordHash:await U.hash('changeme123'),rank:'Создатель',banned:false,isCreator:true,registered:new Date().toISOString(),mustChange:true});this.save(us)}},
+find(l){return this.users().find(u=>u.login.toLowerCase()===l.toLowerCase()||(u.email&&u.email.toLowerCase()===l.toLowerCase()))},
+update(login,patch){const us=this.users();const i=us.findIndex(u=>u.login===login);if(i===-1)return null;us[i]={...us[i],...patch};this.save(us);return us[i]}};
+
+const Session={save(u){localStorage.setItem(Store.SK,JSON.stringify({user:{login:u.login,username:u.username,rank:u.rank},expires:Date.now()+CONFIG.SESSION_TIMEOUT}))},
+load(){try{const r=localStorage.getItem(Store.SK);if(!r)return null;const d=JSON.parse(r);if(d.expires&&Date.now()>d.expires){localStorage.removeItem(Store.SK);return null}return d.user}catch(e){return null}},
+clear(){localStorage.removeItem(Store.SK)}};
+
+function showErr(id,msg){const el=document.getElementById(id);el.textContent=msg;el.style.display='block'}
+
+async function register(){
+const username=document.getElementById('registerUsername').value.trim();
+const login=document.getElementById('registerLogin').value.trim();
+const email=document.getElementById('registerEmail').value.trim();
+const pass=document.getElementById('registerPassword').value;
+const conf=document.getElementById('registerPasswordConfirm').value;
+document.getElementById('registerError').style.display='none';
+if(!username||!login||!pass||!conf)return showErr('registerError','⚠️ Заполните поля!');
+if(pass!==conf)return showErr('registerError','⚠️ Пароли не совпадают!');
+if(pass.length<CONFIG.MIN_PASS)return showErr('registerError',`⚠️ Пароль ≥ ${CONFIG.MIN_PASS} символов!`);
+if(!/^[a-zA-Z0-9_.-]{3,30}$/.test(login))return showErr('registerError','⚠️ Логин: 3-30 символов (a-z, 0-9, _.-)!');
+const us=Store.users();
+if(us.some(u=>u.login.toLowerCase()===login.toLowerCase()))return showErr('registerError','❌ Логин занят!');
+if(email&&us.some(u=>u.email&&u.email.toLowerCase()===email.toLowerCase()))return showErr('registerError','❌ Email занят!');
+const btn=document.getElementById('registerBtn');btn.classList.add('loading');btn.disabled=true;
+try{
+const passwordHash=await U.hash(pass);
+const nu={username,login,email:email||'',passwordHash,rank:'Новичок',banned:false,registered:new Date().toISOString()};
+us.push(nu);Store.save(us);
+App.user=nu;Session.save(nu);updateUI();closeAuth();
+['registerUsername','registerLogin','registerEmail','registerPassword','registerPasswordConfirm'].forEach(id=>document.getElementById(id).value='');
+Toast.success(`Добро пожаловать, ${username}! 🎉`);
+}catch(e){showErr('registerError','❌ Ошибка: '+e.message)}
+finally{btn.classList.remove('loading');btn.disabled=false}}
+
+async function login(){
+const lf=document.getElementById('loginUsername').value.trim();
+const pw=document.getElementById('loginPassword').value;
+document.getElementById('authError').style.display='none';
+if(!lf||!pw)return showErr('authError','⚠️ Заполните поля!');
+const u=Store.find(lf);
+if(!u)return showErr('authError','❌ Пользователь не найден');
+if(u.banned)return showErr('authError','🚫 Аккаунт заблокирован!');
+const btn=document.getElementById('loginBtn');btn.classList.add('loading');btn.disabled=true;
+try{
+const h=await U.hash(pw);
+if(u.passwordHash!==h)return showErr('authError','❌ Неверный пароль');
+App.user=u;Session.save(u);updateUI();closeAuth();
+document.getElementById('loginPassword').value='';document.getElementById('loginUsername').value='';
+Toast.success(`С возвращением, ${u.username}!`);
+if(u.mustChange)Toast.warning('⚠️ Смените пароль по умолчанию в профиле!',6000);
+}finally{btn.classList.remove('loading');btn.disabled=false}}
+
+function socialLogin(p){Toast.info(`🔗 ${p.toUpperCase()} пока не подключён. Зарегистрируйтесь вручную.`);switchToRegister()}
+
+function logout(){if(!confirm('Выйти?'))return;App.user=null;Session.clear();updateUI();loadPosts();Toast.info('Вы вышли')}
+
+async function changePassword(){
+if(!App.user)return Toast.warning('Не авторизованы');
+const np=document.getElementById('profileNewPassword').value;
+const cp=document.getElementById('profileNewPasswordConfirm').value;
+if(!np||!cp)return Toast.warning('Заполните поля');
+if(np.length<CONFIG.MIN_PASS)return Toast.warning(`Пароль ≥ ${CONFIG.MIN_PASS}`);
+if(np!==cp)return Toast.warning('Пароли не совпадают');
+const h=await U.hash(np);
+const up=Store.update(App.user.login,{passwordHash:h,mustChange:false});
+if(!up)return Toast.error('Ошибка');
+App.user=up;Session.save(up);
+document.getElementById('profileNewPassword').value='';document.getElementById('profileNewPasswordConfirm').value='';
+Toast.success('Пароль изменён!')}
+
+function deleteAccount(){
+if(!App.user)return;
+if(App.user.login===CONFIG.CREATOR)return Toast.warning('Аккаунт создателя нельзя удалить!');
+if(!confirm(`Удалить "${App.user.username}"?`))return;
+if(!confirm('Точно удалить?'))return;
+const users=Store.users().filter(u=>u.login!==App.user.login);Store.save(users);
+const posts=JSON.parse(localStorage.getItem('sologdz_posts')||'[]').filter(p=>p.author!==App.user.username);
+localStorage.setItem('sologdz_posts',JSON.stringify(posts));
+App.user=null;Session.clear();updateUI();loadPosts();Toast.success('Аккаунт удалён')}
+
+function switchToRegister(){document.getElementById('authLoginForm').style.display='none';document.getElementById('authRegisterForm').style.display='block';document.getElementById('authModalTitle').textContent='📝 Регистрация';document.getElementById('authError').style.display='none';document.getElementById('registerError').style.display='none'}
+function switchToLogin(){document.getElementById('authLoginForm').style.display='block';document.getElementById('authRegisterForm').style.display='none';document.getElementById('authModalTitle').textContent='🔐 Вход';document.getElementById('authError').style.display='none';document.getElementById('registerError').style.display='none'}
+function openRegister(){openAuth();switchToRegister()}
+function openAuth(){document.getElementById('authModal').classList.add('active');switchToLogin()}
+function closeAuth(){document.getElementById('authModal').classList.remove('active')}
+
+function renderAdmin(){
+const p=document.getElementById('adminPanel');const ul=document.getElementById('userList');
+if(!App.user||App.user.login!==CONFIG.CREATOR){p.style.display='none';document.getElementById('resetCreatorBtn').style.display='none';return}
+p.style.display='block';document.getElementById('resetCreatorBtn').style.display='block';
+document.getElementById('creatorCurrentRank').textContent=App.user.rank||'Создатель';
+const sel=document.getElementById('creatorRankSelect');
+if(!sel.options.length)sel.innerHTML=RANKS.map(r=>`<option value="${r.v}">${r.e} ${r.l}</option>`).join('');
+sel.value=App.user.rank||'Создатель';
+const users=Store.users();
+ul.innerHTML=users.map(u=>{
+const isC=u.login===CONFIG.CREATOR;const isB=!!u.banned;const isMe=App.user.login===u.login;
+if(isC&&isMe)return`<div class="user-list-item" style="background:rgba(118,75,162,.1);border:1px solid rgba(118,75,162,.3);">
+<div class="user-info"><strong>${U.esc(u.username)}</strong><span style="color:var(--ddim);font-size:13px;">@${U.esc(u.login)}</span>${U.badge(u.rank)}<span style="color:var(--ddim);font-size:13px;">(Это вы)</span></div>
+<span style="color:var(--ddim);font-size:13px;">Управляйте рангом выше ⬆️</span></div>`;
+return`<div class="user-list-item" style="${isB?'background:rgba(255,68,68,.05);':''}">
+<div class="user-info"><strong>${U.esc(u.username)}</strong><span style="color:var(--ddim);font-size:13px;">@${U.esc(u.login)}</span>${isB?'<span class="rank-badge rank-banned">🚫 Забанен</span>':U.badge(u.rank)}</div>
+${!isC?`<div class="user-actions"><select id="rank-${u.login}">${RANKS.map(r=>`<option value="${r.v}" ${u.rank===r.v?'selected':''}>${r.e} ${r.l}</option>`).join('')}</select>
+<button class="btn-save-rank" onclick="changeUserRank('${u.login}')">💾</button>
+${isB?`<button class="btn-unban" onclick="toggleBan('${u.login}')">🔓 Разблок.</button>`:`<button class="btn-ban" onclick="toggleBan('${u.login}')">🔒 Заблок.</button>`}</div>`:'<span style="color:var(--ddim);font-size:13px;">Недоступно</span>'}
+</div>`}).join('')}
+
+function changeCreatorRank(){
+if(!App.user||App.user.login!==CONFIG.CREATOR)return Toast.error('Только для создателя!');
+const r=document.getElementById('creatorRankSelect').value;
+if(r===App.user.rank)return Toast.warning('Это уже ваш ранг');
+const up=Store.update(App.user.login,{rank:r,isCreator:true});
+if(!up)return Toast.error('Ошибка');
+App.user=up;Session.save(up);renderAdmin();updateUI();Toast.success(`Ранг → "${r}"`)}
+
+function changeUserRank(login){
+if(!App.user||App.user.login!==CONFIG.CREATOR)return Toast.error('Только для создателя!');
+const s=document.getElementById(`rank-${login}`);if(!s)return;
+const up=Store.update(login,{rank:s.value});if(!up)return Toast.error('Ошибка');
+renderAdmin();updateUI();Toast.success(`${up.username} → "${s.value}"`)}
+
+function toggleBan(login){
+if(!App.user||App.user.login!==CONFIG.CREATOR)return Toast.error('Только для создателя!');
+if(login===CONFIG.CREATOR)return Toast.warning('Нельзя забанить создателя!');
+const u=Store.users().find(x=>x.login===login);if(!u)return Toast.error('Не найден');
+const nb=!u.banned;if(!confirm(`${nb?'Заблокировать':'Разблокировать'} "${u.username}"?`))return;
+Store.update(login,{banned:nb});renderAdmin();updateUI();Toast.success(`${u.username} ${nb?'заблокирован':'разблокирован'}`)}
+
+function resetCreator(){
+if(!App.user||App.user.login!==CONFIG.CREATOR)return Toast.error('Только для создателя!');
+if(!confirm('Вернуть статус создателя?'))return;
+const up=Store.update(CONFIG.CREATOR,{rank:'Создатель',isCreator:true});
+if(!up)return Toast.error('Создатель не найден');
+App.user=up;Session.save(up);location.reload()}
+
+function updateUI(){
+const u=App.user;
+const disp=document.getElementById('userDisplay');
+const ab=document.getElementById('authBtn');const lb=document.getElementById('logoutBtn');
+const pb=document.getElementById('publishBtn');const w=document.getElementById('publishWarning');
+const nl=document.getElementById('profileNotLogged');const lg=document.getElementById('profileLogged');
+const rc=document.getElementById('resetCreatorBtn');
+rc.style.display=(u&&u.login===CONFIG.CREATOR)?'block':'none';
+if(u){
+disp.innerHTML=`👤 ${U.esc(u.username)} `+U.badge(u.rank);
+ab.style.display='none';lb.style.display='inline-block';
+pb.disabled=!!u.banned;w.style.display=u.banned?'block':'none';
+nl.style.display='none';lg.style.display='block';
+document.getElementById('profileAvatar').textContent=u.username.charAt(0).toUpperCase();
+document.getElementById('profileName').textContent=u.username;
+document.getElementById('profileRank').innerHTML='Роль: '+U.badge(u.rank);
+document.getElementById('profileLogin').textContent='Логин: '+u.login;
+document.getElementById('profileEditUsername').value=u.username;
+document.getElementById('profileEditLogin').value=u.login;
+document.getElementById('profileEditRank').value=u.rank||'Пользователь';
+document.getElementById('deleteAccountBtn').style.display=(u.login===CONFIG.CREATOR)?'none':'inline-block';
+renderAdmin();
+}else{
+disp.innerHTML='🔒 Вы не авторизованы';
+ab.style.display='inline-block';lb.style.display='none';
+pb.disabled=true;w.style.display='block';
+nl.style.display='block';lg.style.display='none'}}
+
+function saveProfileName(){
+if(!App.user)return Toast.warning('Не авторизованы');
+const n=document.getElementById('profileEditUsername').value.trim();
+if(!n||n.length<2)return Toast.warning('Имя ≥ 2 символа');
+if(n.length>30)return Toast.warning('Имя ≤ 30 символов');
+const up=Store.update(App.user.login,{username:n});
+if(!up)return Toast.error('Ошибка');
+App.user=up;Session.save(up);updateUI();Toast.success('Имя обновлено!')}
+
+function switchTab(tab,e){
+document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+if(e&&e.target)e.target.classList.add('active');
+document.getElementById(tab).classList.add('active');
+if(tab==='profile')updateUI();
+if(tab==='community')loadPosts()}
+
+const MathSol={
+findRoots(f,mn=-1000,mx=1000,st=0.1,tol=1e-7){
+const rs=[];let px=mn,py=f(mn);
+for(let x=mn+st;x<=mx;x+=st){let y;try{y=f(x)}catch(e){px=x;py=NaN;continue}
+if(isFinite(y)&&isFinite(py)&&py*y<=0){const r=this.bisect(f,px,x,tol);
+if(r!==null&&!rs.some(v=>Math.abs(v-r)<0.001))rs.push(Math.round(r*1000)/1000)}
+px=x;py=y}return rs},
+bisect(f,a,b,tol){let fa=f(a);for(let i=0;i<100;i++){const m=(a+b)/2,fm=f(m);
+if(Math.abs(fm)<tol||(b-a)/2<tol)return m;if(fa*fm<0)b=m;else{a=m;fa=fm}}return(a+b)/2},
+solve(expr){if(!expr)throw new Error('Пустое выражение');
+if(expr.includes('=')){const p=expr.split('=');if(p.length!==2)throw new Error('Одно "="');
+const[l,r]=p.map(s=>s.trim());
+const f=x=>math.evaluate(l,{x})-math.evaluate(r,{x});
+const roots=this.findRoots(f);return{type:'roots',roots}}
+return{type:'value',result:math.evaluate(expr)}}};
+
+function setRes(id,txt,ok){
+const el=document.getElementById(id);el.textContent=txt;
+el.className='result '+(ok?'success':'error');
+const old=el.querySelector('.copy-btn');if(old)old.remove();
+if(ok&&txt.length>3){const b=document.createElement('button');
+b.className='copy-btn';b.textContent='📋 Копировать';
+b.onclick=()=>U.copy(txt).then(()=>Toast.success('Скопировано!'));
+el.appendChild(b)}}
+
+function solveMath(){
+const inp=document.getElementById('mathInput').value.trim();
+if(!inp)return Toast.warning('Введи пример!');
+const btn=document.getElementById('mathSolveBtn');btn.classList.add('loading');btn.disabled=true;
+try{const o=MathSol.solve(inp);let txt,ok=true;
+if(o.type==='roots'){if(!o.roots.length){txt='❌ Решений не найдено';ok=false}
+else txt='✅ Решение:\n\n'+o.roots.map(r=>`x = ${r}`).join('\n')}
+else txt=`✅ Ответ:\n\n${inp} = ${o.result}`;
+setRes('mathResult',txt,ok);if(ok)addHistory(inp,txt)}
+catch(e){setRes('mathResult','❌ Ошибка: '+e.message,false)}
+finally{btn.classList.remove('loading');btn.disabled=false}}
+
+function addHistory(i,o){App.history.unshift({i,o,t:Date.now()});App.history=App.history.slice(0,CONFIG.MAX_HISTORY);localStorage.setItem('sgdz_math_history',JSON.stringify(App.history));renderHistory()}
+
+function renderHistory(){
+const b=document.getElementById('mathHistory');
+if(!App.history.length){b.innerHTML='<div style="color:var(--ddim);font-size:13px;">История пуста</div>';return}
+b.innerHTML=App.history.map((h,i)=>`<div class="history-item" onclick="useHist(${i})"><strong>${U.esc(h.i)}</strong><div style="color:var(--ddim);font-size:12px;margin-top:4px;">${U.esc(h.o.split('\n').slice(-1)[0])}</div></div>`).join('')}
+
+function useHist(i){const h=App.history[i];if(!h)return;document.getElementById('mathInput').value=h.i;document.getElementById('mathResult').textContent=h.o;Toast.info('Загружено')}
+function clearHistory(){if(!confirm('Очистить?'))return;App.history=[];localStorage.removeItem('sgdz_math_history');renderHistory();Toast.success('Очищено')}
+
+async function translateText(){
+const inp=document.getElementById('translateInput').value.trim();
+const f=document.getElementById('fromLang').value;
+const t=document.getElementById('toLang').value;
+if(!inp)return Toast.warning('Введи текст!');
+const btn=document.getElementById('translateBtn');btn.classList.add('loading');btn.disabled=true;
+setRes('translateResult','⏳ Перевожу...',true);
+try{const lp=(f==='auto'?'autodetect':f)+'|'+t;
+const r=await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(inp)}&langpair=${lp}`);
+const d=await r.json();
+if(d.responseStatus===200)setRes('translateResult','✅ Перевод:\n\n'+d.responseData.translatedText,true);
+else setRes('translateResult','❌ Ошибка: '+(d.responseDetails||'?'),false)}
+catch(e){setRes('translateResult','❌ Сеть: '+e.message,false)}
+finally{btn.classList.remove('loading');btn.disabled=false}}
+
+function switchTool(tool,e){
+document.querySelectorAll('.tool-card').forEach(x=>x.classList.remove('active'));
+document.querySelectorAll('.tool-panel').forEach(x=>x.classList.remove('active'));
+e.currentTarget.classList.add('active');
+document.getElementById('tool-'+tool).classList.add('active')}
+
+function convertBase(){
+const i=document.getElementById('baseInput').value.trim();
+const f=parseInt(document.getElementById('baseFrom').value);
+if(!i)return Toast.warning('Введи число!');
+try{const d=parseInt(i,f);if(isNaN(d))throw new Error('Некорректное');
+setRes('baseResult',`✅ "${i}" (${f}-я):\n\n2-я: ${d.toString(2)}\n8-я: ${d.toString(8)}\n10-я: ${d.toString(10)}\n16-я: ${d.toString(16).toUpperCase()}`,true)}
+catch(e){setRes('baseResult','❌ '+e.message,false)}}
+
+function checkPrime(){
+const n=parseInt(document.getElementById('primeInput').value);
+if(isNaN(n))return Toast.warning('Введи число!');
+if(n<2)return setRes('primeResult',`❌ ${n} — НЕ простое`,false);
+let p=true;for(let i=2;i<=Math.sqrt(n);i++)if(n%i===0){p=false;break}
+setRes('primeResult',p?`✅ ${n} — ПРОСТОЕ`:`❌ ${n} — НЕ простое`,p)}
+
+function calcFactorial(){
+const n=parseInt(document.getElementById('factInput').value);
+if(isNaN(n)||n<0)return Toast.warning('Неотрицательное!');
+if(n>170)return Toast.warning('Максимум 170');
+let f=1n;for(let i=2n;i<=BigInt(n);i++)f*=i;
+setRes('factResult',`✅ ${n}! = ${f}`,true)}
+
+function calcFibonacci(){
+const n=parseInt(document.getElementById('fibInput').value);
+if(isNaN(n)||n<1)return Toast.warning('Больше 0!');
+if(n>78)return Toast.warning('Максимум 78');
+if(n===1)return setRes('fibResult','✅ F(1) = 0',true);
+let a=0n,b=1n;for(let i=2;i<=n;i++){const c=a+b;a=b;b=c}
+setRes('fibResult',`✅ F(${n}) = ${b}`,true)}
+
+function calcModulo(){
+const a=parseInt(document.getElementById('modA').value);
+const b=parseInt(document.getElementById('modB').value);
+if(isNaN(a)||isNaN(b))return Toast.warning('Оба числа!');
+if(b===0)return Toast.warning('На ноль нельзя!');
+const r=a%b,q=Math.floor(a/b);
+let t=`✅ ${a} % ${b} = ${r}\n\n${a} ÷ ${b} = ${q}\nОстаток: ${a} - (${q} × ${b}) = ${r}\n\n`;
+t+=r===0?`🎯 Делится без остатка!`:`⚠️ Не делится нацело`;
+setRes('modResult',t,true)}
+
+function generateCode(){
+const t=document.getElementById('codeTemplate').value;
+const codes={
+hello:`print("Hello, World!")`,
+sum:`a = int(input("A: "))\nb = int(input("B: "))\nprint(f"Сумма: {a+b}")`,
+factorial:`def factorial(n):\n    return 1 if n <= 1 else n * factorial(n-1)\nprint(factorial(10))`,
+fibonacci:`def fib(n):\n    a, b = 0, 1\n    for _ in range(n):\n        print(a, end=" ")\n        a, b = b, a + b\nfib(10)`,
+sort:`numbers = [5,2,8,1,9,3]\nnumbers.sort()\nprint(numbers)`,
+palindrome:`def is_pal(s):\n    s = s.lower().replace(" ","")\n    return s == s[::-1]\nprint(is_pal("А роза упала на лапу Азора"))`,
+prime:`def is_prime(n):\n    if n < 2: return False\n    for i in range(2, int(n**0.5)+1):\n        if n % i == 0: return False\n    return True\nprint(is_prime(17))`,
+modulo:`num = int(input())\nif num % 2 == 0: print("Чётное")\nelse: print("Нечётное")\nprint(17 % 5)`};
+setRes('codeResult','✅ Python:\n\n'+codes[t],true)}
+
+function renderSubjects(){
+document.getElementById('subjectsGrid').innerHTML=SUBJECTS.map(s=>`<div class="subject-card" onclick="selectSubject('${s.n}')"><span class="subject-emoji">${s.e}</span><h3>${s.n}</h3><p>${s.g} класс</p></div>`).join('')}
+
+function selectSubject(s){
+App.subject=s;
+document.getElementById('selectedSubject').style.display='block';
+document.getElementById('subjectName').textContent=s;
+document.getElementById('selectedSubject').scrollIntoView({behavior:'smooth',block:'nearest'});
+setRes('gdzResult','Введи задание и нажми "Решить"',true);
+showGDZ(s)}
+
+const GDZ={
+'Алгебра':[{q:'2x + 5 = 13',a:'x = 4'},{q:'3a + 2b - a + b',a:'2a + 3b'},{q:'x² - 5x + 6 = 0',a:'x₁ = 2, x₂ = 3'}],
+'Геометрия':[{q:'Сумма углов треугольника',a:'180°'},{q:'Площадь квадрата со стороной 5',a:'25 см²'},{q:'Теорема Пифагора',a:'c² = a² + b²'}],
+'Русский язык':[{q:'Разбор "подснежник"',a:'под-снеж-ник'},{q:'Падеж "стоять у дома"',a:'Родительный'},{q:'Спряжение "писать"',a:'1 спряжение'}]};
+
+function showGDZ(s){
+const d=GDZ[s]||GDZ['Алгебра'];
+let h='<ul style="list-style:none;padding:0;">';
+d.forEach((t,i)=>{h+=`<li style="padding:12px 0;border-bottom:1px solid var(--gb);"><strong>Задание ${i+1}:</strong> ${U.esc(t.q)}<br><strong style="color:var(--ok);">Ответ:</strong> ${U.esc(t.a)}</li>`});
+h+='</ul>';
+const el=document.getElementById('gdzContent');el.innerHTML=h;el.className='result success'}
+
+function solveGdz(){
+const inp=document.getElementById('gdzInput').value.trim();
+if(!inp)return Toast.warning('Введи задание!');
+try{const o=MathSol.solve(inp);
+if(o.type==='roots'){
+const t=o.roots.length?'✅ Решение:\n\n'+o.roots.map(r=>`x = ${r}`).join('\n'):'❌ Решений нет';
+setRes('gdzResult',t,o.roots.length>0)}
+else setRes('gdzResult',`✅ Ответ:\n\n${inp} = ${o.result}`,true)}
+catch(e){const d=GDZ[App.subject]||[];
+const f=d.find(x=>x.q.toLowerCase().includes(inp.toLowerCase())||inp.toLowerCase().includes(x.q.toLowerCase()));
+if(f)setRes('gdzResult',`✅ Найдено:\n\n📌 ${f.q}\n📝 ${f.a}`,true);
+else setRes('gdzResult',`❌ Не решено: ${e.message}\n\n💡 Введи пример`,false)}}
+
+function updatePostCounter(){document.getElementById('postCounter').textContent=document.getElementById('postContent').value.length}
+const debouncedLoadPosts=U.deb(loadPosts,300);
+
+function filterPosts(c,e){
+App.filter=c;
+document.querySelectorAll('.filter-chip').forEach(x=>x.classList.remove('active'));
+if(e&&e.target)e.target.classList.add('active');
+loadPosts()}
+
+function loadPosts(){
+const posts=JSON.parse(localStorage.getItem('sologdz_posts')||'[]');
+const search=(document.getElementById('postSearch')?.value||'').toLowerCase().trim();
+let filt=posts.slice().reverse();
+if(App.filter!=='all')filt=filt.filter(p=>p.category===App.filter);
+if(search)filt=filt.filter(p=>p.title.toLowerCase().includes(search)||p.content.toLowerCase().includes(search)||(p.author||'').toLowerCase().includes(search));
+const box=document.getElementById('postsList');
+if(!filt.length){box.innerHTML='<div class="result" style="text-align:center;color:var(--ddim);">Постов не найдено</div>';return}
+const ic={news:'📢',question:'❓',tip:'💡',discussion:'💬'};
+box.innerHTML=filt.map(p=>{
+const ri=posts.indexOf(p);
+const isA=App.user&&App.user.username===p.author;
+const canDel=App.user&&(App.user.login===CONFIG.CREATOR||isA);
+return`<div class="post-card"><div class="post-header"><div><span class="post-category">${ic[p.category]||'📌'} ${p.category}</span><h4 style="margin:5px 0;">${U.esc(p.title)}</h4><small class="post-date">${U.date(p.date)}</small></div><div class="post-actions">${isA?`<button class="post-action-btn" onclick="editPost(${ri})" title="Редактировать">✏️</button>`:''}${canDel?`<button class="post-action-btn" onclick="deletePost(${ri})" title="Удалить">🗑️</button>`:''}</div></div><p class="post-content">${U.esc(p.content).replace(/\n/g,'<br>')}</p><div class="post-author">👤 ${U.esc(p.author||'Аноним')} ${U.badge(p.authorRank)}</div></div>`}).join('')}
+
+function addPost(){
+if(!App.user)return Toast.warning('Войдите!');
+if(App.user.banned)return Toast.error('Вы заблокированы');
+const t=document.getElementById('postTitle').value.trim();
+const c=document.getElementById('postContent').value.trim();
+const cat=document.getElementById('postCategory').value;
+if(!t||!c)return Toast.warning('Заполни заголовок и текст!');
+if(t.length>CONFIG.MAX_TITLE)return Toast.warning('Заголовок слишком длинный');
+if(c.length>CONFIG.MAX_POST)return Toast.warning('Текст слишком длинный');
+const posts=JSON.parse(localStorage.getItem('sologdz_posts')||'[]');
+posts.push({id:U.uid(),title:t,content:c,category:cat,date:new Date().toISOString(),author:App.user.username,authorRank:App.user.rank||'Пользователь'});
+localStorage.setItem('sologdz_posts',JSON.stringify(posts));
+document.getElementById('postTitle').value='';document.getElementById('postContent').value='';
+updatePostCounter();loadPosts();Toast.success('Пост опубликован! 🎉')}
+
+function deletePost(i){
+if(!confirm('Удалить?'))return;
+const posts=JSON.parse(localStorage.getItem('sologdz_posts')||'[]');
+posts.splice(i,1);localStorage.setItem('sologdz_posts',JSON.stringify(posts));
+loadPosts();Toast.success('Удалён')}
+
+function editPost(i){
+const posts=JSON.parse(localStorage.getItem('sologdz_posts')||'[]');
+const p=posts[i];if(!p)return;
+const nt=prompt('Новый заголовок:',p.title);if(nt===null)return;
+const nc=prompt('Новый текст:',p.content);if(nc===null)return;
+if(!nt.trim()||!nc.trim())return Toast.warning('Пустые поля');
+posts[i].title=nt.trim().slice(0,CONFIG.MAX_TITLE);
+posts[i].content=nc.trim().slice(0,CONFIG.MAX_POST);
+posts[i].edited=true;
+localStorage.setItem('sologdz_posts',JSON.stringify(posts));
+loadPosts();Toast.success('Обновлён!')}
+
+function openDev(){document.getElementById('devModal').classList.add('active')}
+function closeDev(){document.getElementById('devModal').classList.remove('active')}
+function openSupport(){document.getElementById('supportModal').classList.add('active');document.getElementById('supportForm').style.display='block';document.getElementById('supportSuccess').style.display='none'}
+function closeSupport(){document.getElementById('supportModal').classList.remove('active')}
+function closeWelcome(){document.getElementById('welcomeOverlay').style.display='none';localStorage.setItem('sgdz_welcome_seen','1')}
+function openWelcome(){document.getElementById('welcomeOverlay').style.display='flex'}
+function closeWelcomeAndLogin(){closeWelcome();openAuth()}
+
+function toggleTheme(){
+document.body.classList.toggle('light');
+const l=document.body.classList.contains('light');
+localStorage.setItem('sgdz_theme',l?'light':'dark');
+document.getElementById('themeBtn').textContent=l?'🌙':'🌓';
+Toast.info(l?'Светлая тема':'Тёмная тема')}
+function loadTheme(){if(localStorage.getItem('sgdz_theme')==='light'){document.body.classList.add('light');document.getElementById('themeBtn').textContent='🌙'}}
+
+function toggleChat(){document.getElementById('chatWindow').classList.toggle('active')}
+function sendChat(){
+const i=document.getElementById('chatInput');const t=i.value.trim();
+if(!t)return;
+const m=document.getElementById('chatMessages');
+m.innerHTML+=`<div class="chat-msg user">${U.esc(t)}</div>`;
+i.value='';m.scrollTop=m.scrollHeight;
+setTimeout(()=>{const a=botAnswer(t.toLowerCase());m.innerHTML+=`<div class="chat-msg bot">${a}</div>`;m.scrollTop=m.scrollHeight},400)}
+
+function botAnswer(q){
+if(/гдз|готов|ответ|решен|решить|домашк|задани|упражн|номер|пример|уравнени|задача/.test(q))
+return`📚 <b>ГДЗ на SoloGDZ</b><br>1. Вкладка "📚 Предметы"<br>2. Выбери предмет<br>3. Введи задание — получишь ответ!<br><br>Предметы: Алгебра, Геометрия, Русский, Литература, Английский, История и др.<br>🚀 Удачи!`;
+if(/разработч|создател|автор|кто ты|кто сделал|developer/.test(q))return'👨‍💻 Разработчик — <b>Кисурин Степан</b>! 🚀';
+if(/кисурин|степан/.test(q))return'✅ Да, Кисурин Степан — создатель!';
+if(/привет|здравств|hello|hi/.test(q))return'Привет! 👋 Спроси про ГДЗ, разработчика или ранги!';
+if(/как дела|как ты/.test(q))return'Отлично! Готов решать 24/7 😎';
+if(/спасибо|thx|thanks/.test(q))return'Пожалуйста! 🙌';
+if(/что умеешь|функци|возможност/.test(q))return'🎯 Умею:<br>• Решать математику<br>• Переводить<br>• Работать с кодом<br>• Давать ГДЗ<br>• Знаю разработчика 😉';
+if(/контакт|связ|телефон|почт/.test(q))return'📞 Контакты — в "О разработчике"!';
+if(/пока|до свидания|bye/.test(q))return'Пока! 👋';
+if(/соло|sologdz/.test(q))return'🔥 SoloGDZ — лучшая решалка! Создана Кисуриным Степаном 💪';
+if(/регистр|аккаунт|создать/.test(q))return'📝 Нажми "Войти" → "Зарегистрироваться"!';
+if(/админ|модератор|ранг/.test(q))return'📋 Ранги: Создатель, Владелец, Легенда, Друг, Помощник, Гл.админ, Админ, Модератор, Старший, Участник, Пользователь, Новичок, Гость, Забанен.<br><br>Управляет только Создатель!';
+return'🤔 Не понял. Спроси про "ГДЗ", "разработчика" или "ранги".'}
+
+document.addEventListener('keydown',e=>{
+if(e.key==='Escape'){document.querySelectorAll('.modal-overlay.active').forEach(m=>m.classList.remove('active'));document.getElementById('chatWindow')?.classList.remove('active')}
+if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){const a=document.activeElement;if(a?.id==='mathInput')solveMath();else if(a?.id==='chatInput')sendChat()}});
+
+['authModal','devModal','supportModal'].forEach(id=>{document.getElementById(id)?.addEventListener('click',e=>{if(e.target.id===id)e.target.classList.remove('active')})});
+
+document.getElementById('supportForm')?.addEventListener('submit',async e=>{
+e.preventDefault();
+const last=parseInt(localStorage.getItem('sgdz_support')||'0');
+if(Date.now()-last<CONFIG.SUPPORT_COOLDOWN)return Toast.warning('Подождите минуту');
+const f=e.target;const b=f.querySelector('button[type="submit"]');
+b.classList.add('loading');b.disabled=true;
+try{const r=await fetch(f.action,{method:'POST',body:new FormData(f),headers:{'Accept':'application/json'}});
+if(r.ok){localStorage.setItem('sgdz_support',Date.now().toString());f.style.display='none';document.getElementById('supportSuccess').style.display='block';f.reset()}
+else Toast.error('Ошибка отправки')}
+catch(err){Toast.error('Сеть: '+err.message)}
+finally{b.classList.remove('loading');b.disabled=false}});
+
+async function initApp(){
+try{
+Toast.init();loadTheme();
+await Store.ensureCreator();
+const s=Session.load();
+if(s){const u=Store.find(s.login);if(u&&!u.banned)App.user=u;else Session.clear()}
+try{App.history=JSON.parse(localStorage.getItem('sgdz_math_history')||'[]')}catch(e){App.history=[]}
+renderSubjects();renderHistory();updateUI();loadPosts();updatePostCounter();
+['postTitle','postContent'].forEach(id=>{const el=document.getElementById(id);if(!el)return;
+el.value=localStorage.getItem('sgdz_draft_'+id)||'';
+el.addEventListener('input',U.deb(()=>{localStorage.setItem('sgdz_draft_'+id,el.value)},500))});
+if(!App.user&&!localStorage.getItem('sgdz_welcome_seen'))document.getElementById('welcomeOverlay').style.display='flex';
+else document.getElementById('welcomeOverlay').style.display='none';
+console.log('%c🚀 SoloGDZ v2.1 загружен!','color:#ff006e;font-size:16px;font-weight:bold');
+console.log('👨‍💻 Кисурин Степан | 🔐 SHA-256 | 📋 Рангов: '+RANKS.length);
+}catch(e){console.error('Init:',e);Toast.error('Ошибка: '+e.message)}}
+
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initApp);
+else initApp();
+</script>
+</body>
+</html>
