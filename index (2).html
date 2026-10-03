@@ -106,8 +106,6 @@ select option{background:#1a1a2e;color:#fff}
 .modal .auth-switch{text-align:center;margin-top:15px;color:rgba(255,255,255,.7);font-size:14px}
 .modal .auth-switch a{color:#00b0ff;cursor:pointer;font-weight:bold;text-decoration:underline}
 .modal .auth-switch a:hover{color:#fff}
-
-/* 🔴 Красная модалка регистрации */
 #authRegisterForm{background:linear-gradient(135deg,#7a0f1f 0%,#4a0010 100%);padding:20px;border-radius:14px;border:2px solid #ff1744;margin-top:10px}
 #authRegisterForm input{background:linear-gradient(135deg,#001f5c,#003080)!important;border:2px solid #2979ff!important;color:#fff!important;font-family:'Segoe UI',sans-serif!important;margin-bottom:12px}
 #authRegisterForm input::placeholder{color:rgba(255,255,255,.55)!important}
@@ -118,19 +116,14 @@ select option{background:#1a1a2e;color:#fff}
 #registerBtn{background:linear-gradient(135deg,#2979ff,#0d47a1)!important;box-shadow:0 6px 20px rgba(41,121,255,.5)}
 #registerBtn:hover:not(:disabled){background:linear-gradient(135deg,#448aff,#1565c0)!important;box-shadow:0 8px 25px rgba(41,121,255,.7)}
 #authRegisterForm h2{color:#fff;text-shadow:0 2px 10px rgba(255,23,68,.8)}
-
-/* Обычные модалки — фиолетовые поля */
 #authLoginForm input,#supportModal input,#supportModal textarea,#supportModal select{background:#1e1e3a!important;border:2px solid rgba(118,75,162,.5)!important;color:#fff!important;font-family:'Segoe UI',sans-serif!important;margin-bottom:12px}
 #authLoginForm input::placeholder,#supportModal input::placeholder,#supportModal textarea::placeholder{color:rgba(255,255,255,.5)!important}
 #authLoginForm input:focus,#supportModal input:focus,#supportModal textarea:focus{border-color:#764ba2!important;box-shadow:0 0 0 4px rgba(118,75,162,.3)!important;background:#252550!important}
-
-/* Светлая тема — поля в модалках */
 body.light .modal{background:#fff;border-color:#764ba2;color:#1a1a2e}
 body.light .modal h2{color:#1a1a2e}
 body.light #authRegisterForm input{background:#fff!important;border-color:#2979ff!important;color:#1a1a2e!important}
 body.light #authLoginForm input,body.light #supportModal input,body.light #supportModal textarea{background:#fff!important;border-color:#764ba2!important;color:#1a1a2e!important}
 body.light #authLoginForm input::placeholder{color:rgba(0,0,0,.4)!important}
-
 .dev-info{text-align:center}
 .dev-avatar{width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;display:flex;align-items:center;justify-content:center;font-size:48px;font-weight:bold;margin:0 auto 20px;box-shadow:0 5px 20px rgba(118,75,162,.4)}
 .dev-name{font-size:24px;font-weight:bold;margin-bottom:5px}
@@ -238,7 +231,6 @@ body.light #authLoginForm input::placeholder{color:rgba(0,0,0,.4)!important}
   </div>
 
   <div class="card">
-    <!-- МАТЕМАТИКА -->
     <div id="math" class="section active">
       <h2 style="margin-bottom:15px;">🧮 Решалка примеров</h2>
       <textarea id="mathInput" rows="3" placeholder="Напиши пример: 2+2*2, sqrt(16), x^2-4=0, sin(pi/2)"></textarea>
@@ -256,7 +248,6 @@ body.light #authLoginForm input::placeholder{color:rgba(0,0,0,.4)!important}
       </div>
     </div>
 
-    <!-- ПЕРЕВОД -->
     <div id="translate" class="section">
       <h2 style="margin-bottom:15px;">🌍 Переводчик всего</h2>
       <textarea id="translateInput" rows="4" placeholder="Вставь любой текст на любом языке..."></textarea>
@@ -285,7 +276,6 @@ body.light #authLoginForm input::placeholder{color:rgba(0,0,0,.4)!important}
       <div class="result" id="translateResult">Здесь появится перевод...</div>
     </div>
 
-    <!-- ПРОГРАММИРОВАНИЕ -->
     <div id="programming" class="section">
       <h2 style="margin-bottom:15px;">💻 Инструменты программиста</h2>
       <div class="tools-grid">
@@ -349,7 +339,6 @@ body.light #authLoginForm input::placeholder{color:rgba(0,0,0,.4)!important}
       </div>
     </div>
 
-    <!-- ПРЕДМЕТЫ -->
     <div id="subjects" class="section">
       <h2 style="margin-bottom:15px;">📚 Все школьные предметы</h2>
       <p style="color:var(--ddim);margin-bottom:15px;">Выбери предмет для получения помощи с ГДЗ</p>
@@ -371,7 +360,6 @@ body.light #authLoginForm input::placeholder{color:rgba(0,0,0,.4)!important}
       </div>
     </div>
 
-    <!-- СООБЩЕСТВО -->
     <div id="community" class="section">
       <h2 style="margin-bottom:15px;">📰 Новости и сообщество</h2>
       <div style="background:var(--glass);padding:20px;border-radius:16px;margin-bottom:20px;border:1px solid var(--gb);">
@@ -406,7 +394,6 @@ body.light #authLoginForm input::placeholder{color:rgba(0,0,0,.4)!important}
       </div>
     </div>
 
-    <!-- ПРОФИЛЬ -->
     <div id="profile" class="section">
       <h2 style="margin-bottom:15px;">👤 Мой профиль</h2>
       <div id="profileNotLogged" style="text-align:center;padding:40px 20px;">
@@ -504,7 +491,7 @@ body.light #authLoginForm input::placeholder{color:rgba(0,0,0,.4)!important}
       <div class="social-links">
         <a href="#" class="social-link"><div class="social-icon">VK</div><div class="social-text"><span class="social-label">ВКонтакте</span><span class="social-value">Степан Кисурин</span></div></a>
         <a href="#" class="social-link"><div class="social-icon">MX</div><div class="social-text"><span class="social-label">MAX</span><span class="social-value">+79089145684</span></div></a>
-        <a href="mailto:stepan.20172008@gmail.com" class="social-link"><div class="social-icon">@</div><div class="social-text"><span class="social-label">Gmail</span><span class="social-value">stepan.20172008@gmail.com</span></div></a>
+        <a href="mailto:scrat4err23@outlook.com" class="social-link"><div class="social-icon">@</div><div class="social-text"><span class="social-label">Outlook</span><span class="social-value">scrat4err23@outlook.com</span></div></a>
       </div>
     </div>
   </div>
@@ -515,7 +502,7 @@ body.light #authLoginForm input::placeholder{color:rgba(0,0,0,.4)!important}
     <button class="close" onclick="closeSupport()">×</button>
     <h2>🛠️ Техподдержка</h2>
     <p style="text-align:center;color:var(--ddim);margin-bottom:20px;">Нашли баг? Напишите!</p>
-    <form id="supportForm" action="https://formsubmit.co/stepan.20172008@gmail.com" method="POST">
+    <form id="supportForm" action="https://formsubmit.co/scrat4err23@outlook.com" method="POST">
       <input type="hidden" name="_subject" value="Новый отзыв SoloGDZ!">
       <input type="hidden" name="_captcha" value="false">
       <input type="hidden" name="_template" value="table">
@@ -643,7 +630,7 @@ const App={user:null,subject:'',filter:'all',history:[]};
 const Store={UK:'sgdz_users_v2',SK:'sgdz_session_v2',
 users(){try{return JSON.parse(localStorage.getItem(this.UK)||'[]')}catch(e){return[]}},
 save(u){localStorage.setItem(this.UK,JSON.stringify(u))},
-async ensureCreator(){const us=this.users();if(!us.some(u=>u.login===CONFIG.CREATOR)){us.push({username:'Кисурин Степан',login:CONFIG.CREATOR,passwordHash:await U.hash('changeme123'),rank:'Создатель',banned:false,isCreator:true,registered:new Date().toISOString(),mustChange:true});this.save(us)}},
+async ensureCreator(){const us=this.users();if(!us.some(u=>u.login===CONFIG.CREATOR)){us.push({username:'Кисурин Степан',login:CONFIG.CREATOR,email:'scrat4err23@outlook.com',passwordHash:await U.hash('changeme123'),rank:'Создатель',banned:false,isCreator:true,registered:new Date().toISOString(),mustChange:true});this.save(us)}},
 find(l){return this.users().find(u=>u.login.toLowerCase()===l.toLowerCase()||(u.email&&u.email.toLowerCase()===l.toLowerCase()))},
 update(login,patch){const us=this.users();const i=us.findIndex(u=>u.login===login);if(i===-1)return null;us[i]={...us[i],...patch};this.save(us);return us[i]}};
 
@@ -1066,13 +1053,13 @@ setTimeout(()=>{const a=botAnswer(t.toLowerCase());m.innerHTML+=`<div class="cha
 function botAnswer(q){
 if(/гдз|готов|ответ|решен|решить|домашк|задани|упражн|номер|пример|уравнени|задача/.test(q))
 return`📚 <b>ГДЗ на SoloGDZ</b><br>1. Вкладка "📚 Предметы"<br>2. Выбери предмет<br>3. Введи задание — получишь ответ!<br><br>Предметы: Алгебра, Геометрия, Русский, Литература, Английский, История и др.<br>🚀 Удачи!`;
-if(/разработч|создател|автор|кто ты|кто сделал|developer/.test(q))return'👨‍💻 Разработчик — <b>Кисурин Степан</b>! 🚀';
+if(/разработч|создател|автор|кто ты|кто сделал|developer/.test(q))return'👨‍💻 Разработчик — <b>Кисурин Степан</b>! 🚀<br>📧 Email: scrat4err23@outlook.com';
 if(/кисурин|степан/.test(q))return'✅ Да, Кисурин Степан — создатель!';
 if(/привет|здравств|hello|hi/.test(q))return'Привет! 👋 Спроси про ГДЗ, разработчика или ранги!';
 if(/как дела|как ты/.test(q))return'Отлично! Готов решать 24/7 😎';
 if(/спасибо|thx|thanks/.test(q))return'Пожалуйста! 🙌';
 if(/что умеешь|функци|возможност/.test(q))return'🎯 Умею:<br>• Решать математику<br>• Переводить<br>• Работать с кодом<br>• Давать ГДЗ<br>• Знаю разработчика 😉';
-if(/контакт|связ|телефон|почт/.test(q))return'📞 Контакты — в "О разработчике"!';
+if(/контакт|связ|телефон|почт|email/.test(q))return'📧 Email разработчика: scrat4err23@outlook.com<br>📞 MAX: +79089145684';
 if(/пока|до свидания|bye/.test(q))return'Пока! 👋';
 if(/соло|sologdz/.test(q))return'🔥 SoloGDZ — лучшая решалка! Создана Кисуриным Степаном 💪';
 if(/регистр|аккаунт|создать/.test(q))return'📝 Нажми "Войти" → "Зарегистрироваться"!';
@@ -1110,8 +1097,9 @@ el.value=localStorage.getItem('sgdz_draft_'+id)||'';
 el.addEventListener('input',U.deb(()=>{localStorage.setItem('sgdz_draft_'+id,el.value)},500))});
 if(!App.user&&!localStorage.getItem('sgdz_welcome_seen'))document.getElementById('welcomeOverlay').style.display='flex';
 else document.getElementById('welcomeOverlay').style.display='none';
-console.log('%c🚀 SoloGDZ v2.1 загружен!','color:#ff006e;font-size:16px;font-weight:bold');
-console.log('👨‍💻 Кисурин Степан | 🔐 SHA-256 | 📋 Рангов: '+RANKS.length);
+console.log('%c🚀 SoloGDZ v2.2 загружен!','color:#ff006e;font-size:16px;font-weight:bold');
+console.log('👨‍💻 Кисурин Степан | 📧 scrat4err23@outlook.com');
+console.log('🔐 SHA-256 | 📋 Рангов: '+RANKS.length);
 }catch(e){console.error('Init:',e);Toast.error('Ошибка: '+e.message)}}
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initApp);
